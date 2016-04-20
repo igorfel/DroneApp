@@ -1,0 +1,46 @@
+///
+/// Created by Igorfel 20/04/16
+///
+#ifndef CLIENT_H
+#define CLIENT_H
+
+#include <QtNetwork>
+#include <QObject>
+#include <QString>
+#include <QTcpSocket>
+#include <QHostAddress>
+
+class Client: public QObject
+{
+    Q_OBJECT
+public:
+    explicit Client  (QObject *parent = 0);
+             Client  (QString address = "", quint16 port = 0);
+             ~Client ();
+
+    void Connect2Host(QString address, quint16 port);
+
+    bool writeData(QString str);
+    bool isConneted();
+
+private:
+    bool hasConnection;
+
+    QTcpSocket client;
+    QString bytesReaded;
+    QNetworkSession *networkSession;
+
+
+    void Init();
+    void registerSlots();
+
+signals:
+    void hasReadData();
+
+private slots:
+    void readData();
+    void Awake();
+
+};
+
+#endif // CLIENT_H

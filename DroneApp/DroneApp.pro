@@ -18,12 +18,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    Communication/client.cpp
+    Communication/src/client.cpp \
+    Accelerometer/src/accelhandler.cpp
 
 HEADERS  += mainwindow.h \
     SistemasdeControle/headers/graphicLibs/plot.h \
     SistemasdeControle/src/graphicLibs/plot.hpp \
-    Communication/client.h
+    Communication/header/client.h \
+    Test/clienttestsuite.h \
+    Accelerometer/header/accelhandler.h
 
 FORMS    += mainwindow.ui
 

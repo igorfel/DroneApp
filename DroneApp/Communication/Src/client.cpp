@@ -1,4 +1,4 @@
-#include "client.h"
+#include "../header/client.h"
 
 //START PUBLIC-----///////
 Client::Client(QObject *parent): QObject(parent) {

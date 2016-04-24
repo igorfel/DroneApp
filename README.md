@@ -7,3 +7,9 @@
 * Accelerometer data reading and treatment (in development)
 * Filters (not implemented yet)
 * Interface (in development)
+
+##Step-by-setp setup
+1) Open the [DroneApp](https://github.com/igorfel/DroneApp/tree/master/DroneApp) folder and click download zip<br>
+2) Extract the project on an desired folder<br>
+3) Then look inside of the folder and you'll find a .pro project, open it up<br>
+4) have fun!<br>

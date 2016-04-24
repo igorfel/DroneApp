@@ -1,16 +1,16 @@
 #include "SistemasdeControle/headers/graphicLibs/plot.h"
 
 template<typename Type>
-PlotHandler::plot<Type>::plot(QMainWindow *MainWindow)
+PlotHandler::plot<Type>::plot(QWidget *PlotFrame)
 {
-    this->properties.setWindow(MainWindow);
+    this->properties.setPlotFrame(PlotFrame);
     this->realTimePlotInit();
 }
 
 template<typename Type>
-PlotHandler::plot<Type>::plot(unsigned ySubplot, unsigned xSubplot, QMainWindow *MainWindow)
+PlotHandler::plot<Type>::plot(unsigned ySubplot, unsigned xSubplot, QWidget *PlotFrame)
 {
-    this->properties.setWindow(MainWindow);
+    this->properties.setPlotFrame(PlotFrame);
     this->properties.setPlotSize(this->properties.windowSizeX*(xSubplot-1),this->properties.windowSizeY*(ySubplot-1),this->properties.windowSizeX, this->properties.windowSizeY);
     this->realTimePlotInit();
 }
@@ -25,11 +25,19 @@ PlotHandler::plot<Type>::plot(unsigned ySubplot, unsigned xSubplot, plotProperti
 }
 
 template<typename Type>
-PlotHandler::plot<Type>::plot(LinAlg::Matrix<Type> X, QMainWindow *MainWindow)
+PlotHandler::plot<Type>::plot(LinAlg::Matrix<Type> X, QWidget *PlotFrame)
 {
     LinAlg::Matrix<Type> Y = LinAlg::LineVector<Type>(0,X.getNumberOfColumns());
-    this->properties.setWindow(MainWindow);
-    this->generalPlot(X);
+    this->properties.setPlotFrame(PlotFrame);
+    this->generalPlot(Y,X);
+}
+
+template<typename Type>
+PlotHandler::plot<Type>::plot(LinAlg::Matrix<Type> X, plotProperties properties)
+{
+    LinAlg::Matrix<Type> Y = LinAlg::LineVector<Type>(0,X.getNumberOfColumns());
+    this->properties = properties;
+    this->generalPlot(Y,X);
 }
 
 template<typename Type>
@@ -40,16 +48,16 @@ PlotHandler::plot<Type>::plot(LinAlg::Matrix<Type> X, LinAlg::Matrix<Type> Y, pl
 }
 
 template<typename Type>
-PlotHandler::plot<Type>::plot(LinAlg::Matrix<Type> X, LinAlg::Matrix<Type> Y, QMainWindow *MainWindow)
+PlotHandler::plot<Type>::plot(LinAlg::Matrix<Type> X, LinAlg::Matrix<Type> Y, QWidget *PlotFrame)
 {
-    this->properties.setWindow(MainWindow);
+    this->properties.setPlotFrame(PlotFrame);
     this->generalPlot(X,Y);
 }
 
 template<typename Type>
-PlotHandler::plot<Type>::plot(LinAlg::Matrix<Type> X, LinAlg::Matrix<Type> Y, unsigned ySubplot, unsigned xSubplot, QMainWindow *MainWindow)
+PlotHandler::plot<Type>::plot(LinAlg::Matrix<Type> X, LinAlg::Matrix<Type> Y, unsigned ySubplot, unsigned xSubplot, QWidget *PlotFrame)
 {
-    this->properties.setWindow(MainWindow);
+    this->properties.setPlotFrame(PlotFrame);
     this->properties.setPlotSize(this->properties.windowSizeX*(xSubplot-1),this->properties.windowSizeY*(ySubplot-1),this->properties.windowSizeX, this->properties.windowSizeY);
     this->generalPlot(X,Y);
 }
@@ -65,8 +73,10 @@ PlotHandler::plot<Type>::plot(LinAlg::Matrix<Type> X, LinAlg::Matrix<Type> Y, un
 template <typename Type>
 void PlotHandler::plot<Type>::generalPlot(LinAlg::Matrix<Type> X, LinAlg::Matrix<Type> Y)
 {
-    customPlot = new QCustomPlot(properties.centralWidget);
-    customPlot->setGeometry(QRect(0, 0, this->properties.centralWidget->geometry().width(), this->properties.centralWidget->geometry().height()));
+    this->properties.PlotFrame->hide();
+
+    customPlot = new QCustomPlot(this->properties.PlotFrame);
+    customPlot->setGeometry(this->properties.PlotFrame->rect());//QRect(0, 0,this->properties.PlotFrame->geometry().width(), this->properties.PlotFrame->geometry().height()));
 
     // add title layout element:
     if(this->properties.titleFlag)
@@ -111,16 +121,23 @@ void PlotHandler::plot<Type>::generalPlot(LinAlg::Matrix<Type> X, LinAlg::Matrix
         }
      }
     customPlot->rescaleAxes();
-    customPlot->replot();
-    customPlot->repaint();
+    if(this->properties.xAxisRangeFlag)
+        customPlot->xAxis->setRange(this->properties.getxAxisMinRange(), this->properties.getxAxisMaxRange());
+    if(this->properties.yAxisRangeFlag)
+        customPlot->yAxis->setRange(this->properties.getyAxisMinRange(), this->properties.getyAxisMaxRange());
+    //customPlot->replot();
+    this->properties.PlotFrame->show();
 }
 
 template <typename Type>
 void PlotHandler::plot<Type>::generalPlot(LinAlg::Matrix<Type> X)
 {
-    customPlot = new QCustomPlot(properties.centralWidget);
-    customPlot->setGeometry(QRect(0, 0, this->properties.centralWidget->geometry().width(), this->properties.centralWidget->geometry().height()));
-    //customPlot->setGeometry(QRect(this->properties.windowPosX, this->properties.windowPosY, this->properties.windowSizeX, this->properties.windowSizeY));
+//    centralWidget = new QWidget(this->properties.MainWindow);
+//    centralWidget->setGeometry(QRect(this->properties.windowPosX, this->properties.windowPosY, this->properties.windowSizeX, this->properties.windowSizeY));
+    this->properties.PlotFrame->hide();
+
+    customPlot = new QCustomPlot(this->properties.PlotFrame);
+    customPlot->setGeometry(this->properties.PlotFrame->rect());//QRect(0, 0,this->properties.PlotFrame->geometry().width(), this->properties.PlotFrame->geometry().height()));
 
     // add title layout element:
     if(this->properties.titleFlag)
@@ -163,45 +180,29 @@ void PlotHandler::plot<Type>::generalPlot(LinAlg::Matrix<Type> X)
 
     }
     customPlot->rescaleAxes();
-    customPlot->replot();
-    customPlot->repaint();
+
+    this->properties.PlotFrame->show();
 }
 
 template <typename Type>
 void PlotHandler::plot<Type>::realTimeDataUpdate(double i, double j)
 {
 //    double key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
-    this->properties.centralWidget->hide();
-
-    this->properties.setPlotSize(this->properties.windowSizeX/**(xSubplot-1)*/,this->properties.windowSizeY/**(ySubplot-1)*/,this->properties.windowSizeX, this->properties.windowSizeY);
-    customPlot->setGeometry(this->properties.centralWidget->rect());//QRect(0, 0, this->properties.centralWidget->geometry().width(), this->properties.centralWidget->geometry().height()));
     customPlot->graph(0)->addData(i, j);
-    customPlot->graph()->rescaleAxes(true);
-    customPlot->graph(0)->removeDataBefore(i-100);
+    customPlot->graph(0)->removeDataBefore(i-8);
     customPlot->graph(1)->clearData();
     customPlot->graph(1)->addData(i, j);
     customPlot->rescaleAxes();
     customPlot->replot();
-    customPlot->repaint();
-
-    this->properties.centralWidget->show();
-}
-
-template <typename Type>
-void PlotHandler::plot<Type>::realTimeDataUpdate(LinAlg::Matrix<Type> X, LinAlg::Matrix<Type> Y)
-{
-    for(unsigned i = 1; i <= X.getNumberOfColumns(); i++)
-    {
-        this->realTimeDataUpdate(X(1,i),Y(1,i));
-    }
 }
 
 template <typename Type>
 void PlotHandler::plot<Type>::realTimePlotInit()
 {
-    customPlot = new QCustomPlot(this->properties.centralWidget);
-    customPlot->setGeometry(QRect(0, 0, this->properties.centralWidget->geometry().width(), this->properties.centralWidget->geometry().height()));
-    //customPlot->setGeometry(QRect(0,0, this->properties.windowSizeX, this->properties.windowSizeY));
+//    centralWidget = new QWidget(this->properties.MainWindow);
+//    centralWidget->setGeometry(QRect(this->properties.windowPosX, this->properties.windowPosY, this->properties.windowSizeX, this->properties.windowSizeY));
+    customPlot = new QCustomPlot(this->properties.PlotFrame);
+    customPlot->setGeometry(this->properties.PlotFrame->rect());//QRect(0, 0,this->properties.PlotFrame->geometry().width(), this->properties.PlotFrame->geometry().height()));
 
     customPlot->addGraph(); // blue line
     customPlot->graph()->setPen(QPen(Qt::blue));
@@ -228,3 +229,4 @@ void PlotHandler::plot<Type>::realTimePlotInit()
         customPlot->yAxis->setLabel(this->properties.yLabel.c_str());
 
 }
+

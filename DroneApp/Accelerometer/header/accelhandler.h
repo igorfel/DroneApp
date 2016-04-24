@@ -8,7 +8,6 @@
 #include <QAccelerometer>
 #include <SistemasdeControle/headers/primitiveLibs/LinAlg/matrix.h>
 
-
 class AccelHandler : public QObject, QAccelerometerFilter
 {
     Q_OBJECT
@@ -17,30 +16,37 @@ public:
              AccelHandler(LinAlg::Matrix<double> externalDataX = "0",
                           LinAlg::Matrix<double> externalDataY = "0",
                           LinAlg::Matrix<double> externalDataZ = "0");
-             AccelHandler(QObject* parent = 0, QAccelerometer::AccelerationMode AccelMode = QAccelerometer::AccelerationMode::Combined, unsigned dataRate = 10);
-
-    qreal getX();
-    qreal getY();
-    qreal getZ();
+             AccelHandler(QAccelerometer::AccelerationMode AccelMode = QAccelerometer::Combined, unsigned dataRate = 10);
 
     void                   setSamplingData();
     LinAlg::Matrix<double> getSamplingData();
 
+    qreal getX(){ return x; }
+    qreal getY(){ return y; }
+    qreal getZ(){ return z; }
+
+    LinAlg::Matrix<double> getAccelX(){ return AccelX; }
+    LinAlg::Matrix<double> getAccelY(){ return AccelY; }
+    LinAlg::Matrix<double> getAccelZ(){ return AccelZ; }
+
+    double getPhysicalAccelX(){ return physicalX; }
+    double getPhysicalAccelY(){ return physicalY; }
+    double getPhysicalAccelZ(){ return physicalZ; }
+
 private:
     unsigned samplingPeriod;
 
+    double physicalX,physicalY,physicalZ;
+
     qreal x,y,z;
     QAccelerometer* m_sensor;
-    LinAlg::Matrix<double> AccelX, AccelY, AccelZ;
+    LinAlg::Matrix<double> AccelX, AccelY, AccelZ, Gravity;
 
+    void Update();
+    void lowPassFilter(double alpha);
+    void initAccelDataCapacity();
     void startListeningExternal();
     void startListeningAccelerometer(QAccelerometer::AccelerationMode AccelMode, unsigned dataRate);
-
-    void initAccelDataCapacity();
-
-private slots:
-    void Update();
-    void startUpdate();
 
     //Override of QAcclerometerFilter::filter(QAccelerometerReading*)
     bool filter(QAccelerometerReading* reading);

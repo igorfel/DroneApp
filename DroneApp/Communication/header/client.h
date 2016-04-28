@@ -19,14 +19,17 @@ public:
              ~Client ();
 
     void Connect2Host(QString address, quint16 port);
+    void DisconnectFromHost();
 
     bool writeData(QString str);
     bool isConneted();
 
+    QString dataReceived();
+
 private:
     bool hasConnection;
 
-    QTcpSocket client;
+    QTcpSocket socket;
     QString bytesReaded;
     QNetworkSession *networkSession;
 
@@ -36,6 +39,7 @@ private:
 
 signals:
     void hasReadData();
+    void connectionSuccessful();
 
 private slots:
     void readData();

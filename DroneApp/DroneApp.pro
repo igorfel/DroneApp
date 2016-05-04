@@ -19,14 +19,16 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     Communication/src/client.cpp \
-    Accelerometer/src/accelhandler.cpp
+    Accelerometer/src/accelhandler.cpp \
+    qcustomplot.cpp
 
 HEADERS  += mainwindow.h \
     SistemasdeControle/headers/graphicLibs/plot.h \
     SistemasdeControle/src/graphicLibs/plot.hpp \
     Communication/header/client.h \
     Test/clienttestsuite.h \
-    Accelerometer/header/accelhandler.h
+    Accelerometer/header/accelhandler.h \
+    qcustomplot.h
 
 FORMS    += mainwindow.ui
 

@@ -1,4 +1,5 @@
 #include "../header/client.h"
+#include <iostream>
 
 //START PUBLIC-----///////
 Client::Client(QObject *parent): QObject(parent) {
@@ -14,29 +15,42 @@ Client::Client(QString address, quint16 port) {
 }
 
 Client::~Client() {
-    client.disconnectFromHost();
-    client.close();
+    DisconnectFromHost();
 }
 
 void Client::Connect2Host(QString address, quint16 port) {
     QHostAddress addr(address);
-    client.connectToHost(addr, port);
+    socket.connectToHost(addr, port);
 }
 
-//QTcpSocket Client::getClient() {
-//    return this->client;
+void Client::DisconnectFromHost() {
+    socket.disconnectFromHost();
+    socket.close();
+}
+
+//QTcpClient Client::getClient() {
+//    return this->Client;
 //}
 
 bool Client::isConneted() {
+    std::cout<<socket.errorString().toStdString();
     return this->hasConnection;
 }
 
 bool Client::writeData(QString str)
 {
-    client.waitForConnected();
-    client.write(str.toStdString().c_str());
+    if(this->hasConnection)
+    {
+        socket.waitForConnected();
+        socket.write(str.toStdString().c_str());
+    }
 
-    return client.flush();
+    return socket.flush();
+}
+
+QString Client::dataReceived()
+{
+    return this->bytesReaded;
 }
 //END PUBLIC------////////
 
@@ -65,24 +79,25 @@ void Client::Init() {
 }
 
 void Client::registerSlots() {
-    connect(&client, SIGNAL(connected()), this, SLOT(Awake()));
-    connect(&client, SIGNAL(readyRead()), this, SLOT(readData()));
+    connect(&socket, SIGNAL(connected()), this, SLOT(Awake()));
+    connect(&socket, SIGNAL(readyRead()), this, SLOT(readData()));
 }
 //END PRIVATE-----///////////
 
 //START SLOTS-----////////
 void Client::Awake() {
     this->hasConnection = true;
+    emit connectionSuccessful();
 }
 
 /*!
  * \brief     Client::readData
- *  \details   This function is triggered when the client receives any data.
+ *  \details   This function is triggered when the Client receives any data.
  */
 
 void Client::readData(){
     char buffer[1024] = {0};
-    client.read(buffer, client.bytesAvailable());
+    socket.read(buffer, socket.bytesAvailable());
     this->bytesReaded = buffer;
 
     emit this->hasReadData();

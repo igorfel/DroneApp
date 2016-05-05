@@ -4,7 +4,7 @@
 #include <time.h>
 #include <QMainWindow>
 #include <QAccelerometer>
-#include <Communication/header/client.h>
+#include <Communication/client.h>
 #include <Accelerometer/header/accelhandler.h>
 #include <SistemasdeControle/headers/graphicLibs/plot.h>
 

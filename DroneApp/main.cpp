@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
-#include <Communication/header/client.h>
+#include <Communication/client.h>
 #include <iostream>
 
 int main(int argc, char *argv[])

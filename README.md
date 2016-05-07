@@ -13,3 +13,6 @@
 2) Extract the project on an desired folder<br>
 3) Then look inside of the folder and you'll find a .pro project, open it up<br>
 4) have fun!<br>
+
+
+[Direct link](https://github.com/igorfel/DroneApp/releases)

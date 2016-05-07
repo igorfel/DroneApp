@@ -6,7 +6,7 @@
 * TCP/IP connection & communication (working)
 * Accelerometer data reading and treatment (in development)
 * Filters (not implemented yet)
-* Interface (in development)
+* Interface (Working)
 
 ##Step-by-setp setup
 1) To get the [DroneApp](https://github.com/igorfel/DroneApp) just click [download zip](https://github.com/igorfel/DroneApp/archive/master.zip)<br>

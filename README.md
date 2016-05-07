@@ -15,4 +15,4 @@
 4) have fun!<br>
 
 
-[Direct link](https://github.com/igorfel/DroneApp/releases)
+[Direct link - Release versions](https://github.com/igorfel/DroneApp/releases)
